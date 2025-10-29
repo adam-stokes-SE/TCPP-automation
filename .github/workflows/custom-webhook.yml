@@ -32,7 +32,7 @@ jobs:
             description: getValue("Description"),
             age: getValue("Age"),
             height: getValue("Height"),
-            customField4: getValue("Field4"),
+            name: getValue("name: "),
             customField5: getValue("Field5")
           };
 
