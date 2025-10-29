@@ -7,7 +7,6 @@ on:
 jobs:
   send-custom-webhook:
     runs-on: ubuntu-latest
-
     steps:
     - name: Parse issue body and send webhook
       uses: actions/github-script@v6
@@ -15,28 +14,31 @@ jobs:
         script: |
           const body = context.payload.issue.body;
 
-          // Example: assume the body format is like:
-          // Description: This is a description
-          // Age: 25
-          // Height: 180
-          // Field4: value4
-          // Field5: value5
+          // Extract value after the keyword labels using regex
+          // We assume the pattern is label + value without space, so split accordingly
 
-          function getValue(label) {
-            const regex = new RegExp(`${label}: *(.*)`);
-            const match = body.match(regex);
-            return match ? match[1].trim() : "";
+          function extractValue(label, text) {
+            const regex = new RegExp(label + '(.*?)(?=Company|How many parts per bed\\?|Material|STL File|$)', 's');
+            const match = text.match(regex);
+            return match ? match[1].trim().replace(/\n/g, ' ') : "";
           }
 
+          // Extract fields based on your description
+          const company = extractValue("Company", body);
+          const parts = extractValue("How many parts per bed?", body);
+          const material = extractValue("Material", body);
+          const link = extractValue("STL File", body);
+
           const data = {
-            description: getValue("Description"),
-            age: getValue("Age"),
-            height: getValue("Height"),
-            name: getValue("name: "),
-            customField5: getValue("Field5")
+            company,
+            parts,
+            material,
+            link
           };
 
-          //const fetch = require('node-fetch');
+          console.log('Parsed data:', data);
+
+          // Send the data as JSON to your webhook endpoint
           const url = 'https://hooks.slack.com/triggers/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';
 
           await fetch(url, {
