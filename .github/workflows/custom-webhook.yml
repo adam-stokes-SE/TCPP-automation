@@ -36,7 +36,7 @@ jobs:
             customField5: getValue("Field5")
           };
 
-          const fetch = require('node-fetch');
+          //const fetch = require('node-fetch');
           const url = 'https://hooks.slack.com/triggers/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';
 
           await fetch(url, {
