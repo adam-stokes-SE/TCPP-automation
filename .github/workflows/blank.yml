@@ -1,0 +1,46 @@
+name: Send Parsed Webhook
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  send-custom-webhook:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Parse issue body and send webhook
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const body = context.payload.issue.body;
+
+          // Example: assume the body format is like:
+          // Description: This is a description
+          // Age: 25
+          // Height: 180
+          // Field4: value4
+          // Field5: value5
+
+          function getValue(label) {
+            const regex = new RegExp(`${label}: *(.*)`);
+            const match = body.match(regex);
+            return match ? match[1].trim() : "";
+          }
+
+          const data = {
+            description: getValue("Description"),
+            age: getValue("Age"),
+            height: getValue("Height"),
+            customField4: getValue("Field4"),
+            customField5: getValue("Field5")
+          };
+
+          const fetch = require('node-fetch');
+          const url = 'https://your-application-endpoint.com/webhook';
+
+          await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
